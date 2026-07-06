@@ -1,6 +1,12 @@
 import { clampToBounds, distance, normalize, toward } from '../core/vector';
 import type { SeededRandom } from '../random/seededRandom';
-import { blendWithFoodPheromone, depositFoodPheromone, sampleFoodPheromoneSignal } from './pheromoneSystem';
+import {
+  blendWithFoodPheromone,
+  depositFoodPheromone,
+  foodPheromoneFollowProbability,
+  foodPheromoneInfluence,
+  sampleFoodPheromoneSignal
+} from './pheromoneSystem';
 import type { Ant, Food, Nest, SimulationEvent, WorldState } from '../world/worldTypes';
 
 const perceptionRadius = 5;
@@ -8,9 +14,8 @@ const pickupRadius = 0.75;
 const deliveryRadius = 1.2;
 const antSpeed = 0.34;
 const directionNoise = 0.55;
-const pheromoneDirectionNoise = 0.12;
-const maxPheromoneFollowProbability = 0.78;
-const maxPheromoneInfluence = 0.68;
+const pheromoneDirectionNoise = 0.07;
+const returnTrailSecondaryDepositMultiplier = 0.65;
 const maxEvents = 80;
 
 const findNearestAvailableFood = (ant: Ant, foods: Food[]): Food | undefined => {
@@ -82,6 +87,7 @@ export const runAntBehaviorSystem = (world: WorldState, random: SeededRandom): v
       ant.state = 'returningToNest';
       ant.direction = toward(ant.position, nest.position);
       moveAnt(ant, world);
+      depositFoodPheromone(world, ant.position, world.foodPheromoneGrid.depositAmount * returnTrailSecondaryDepositMultiplier);
 
       if (distance(ant.position, nest.position) <= deliveryRadius) {
         ant.carryingFood = false;
@@ -131,8 +137,8 @@ export const runAntBehaviorSystem = (world: WorldState, random: SeededRandom): v
 
     ant.state = 'exploring';
     const foodPheromoneSignal = sampleFoodPheromoneSignal(world, ant.position);
-    if (foodPheromoneSignal && random.next() < Math.min(maxPheromoneFollowProbability, 0.18 + foodPheromoneSignal.intensity / 12)) {
-      const influence = Math.min(maxPheromoneInfluence, 0.2 + foodPheromoneSignal.intensity / 14);
+    if (foodPheromoneSignal && random.next() < foodPheromoneFollowProbability(foodPheromoneSignal.intensity)) {
+      const influence = foodPheromoneInfluence(foodPheromoneSignal.intensity);
       ant.direction = blendWithFoodPheromone(ant.direction, foodPheromoneSignal, influence);
       ant.direction = normalize({
         x: ant.direction.x + random.nextSigned() * pheromoneDirectionNoise,

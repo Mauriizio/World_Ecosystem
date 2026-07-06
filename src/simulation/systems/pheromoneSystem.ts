@@ -1,8 +1,10 @@
 import { distance, normalize, toward } from '../core/vector';
 import type { FoodPheromoneCell, FoodPheromoneSignal, Vector2, WorldState } from '../world/worldTypes';
 
-const neighborhoodRadiusInCells = 1;
-const signalDetectionRadius = 3.25;
+const neighborhoodRadiusInCells = 2;
+const signalDetectionRadius = 5.5;
+const maxFoodPheromoneFollowProbability = 0.92;
+const maxFoodPheromoneInfluence = 0.82;
 
 const cellCoordinate = (value: number, cellSize: number): number => Math.floor(value / cellSize);
 
@@ -75,6 +77,10 @@ export const sampleFoodPheromoneSignal = (world: WorldState, position: Vector2):
     intensity: totalIntensity
   };
 };
+
+export const foodPheromoneFollowProbability = (signalIntensity: number): number => Math.min(maxFoodPheromoneFollowProbability, 0.28 + signalIntensity / 7);
+
+export const foodPheromoneInfluence = (signalIntensity: number): number => Math.min(maxFoodPheromoneInfluence, 0.32 + signalIntensity / 10);
 
 export const blendWithFoodPheromone = (currentDirection: Vector2, signal: FoodPheromoneSignal, strength: number): Vector2 =>
   normalize({

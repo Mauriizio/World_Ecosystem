@@ -88,10 +88,10 @@ export const createInitialWorld = ({
     colonies: [colony],
     foodPheromoneGrid: {
       cellSize: 2,
-      evaporationRate: 0.94,
-      minIntensity: 0.05,
-      maxIntensity: 20,
-      depositAmount: 1.8,
+      evaporationRate: 0.985,
+      minIntensity: 0.03,
+      maxIntensity: 50,
+      depositAmount: 5.5,
       cells: [],
       lastDepositTick: null
     },

@@ -33,6 +33,10 @@ export const StatsPanel = ({ snapshot }: Readonly<{ snapshot: ReadonlyWorldSnaps
             <Metric label="Comida total" value={snapshot.stats.totalFoodAmount} />
             <Metric label="Reserva nido" value={snapshot.stats.nestStoredFood} />
             <Metric label="Intervenciones" value={snapshot.experiment.interventionCount} />
+            <Metric label="Feromona total" value={snapshot.stats.foodPheromoneTotalIntensity.toFixed(1)} />
+            <Metric label="Celdas feromona" value={snapshot.stats.foodPheromoneActiveCells} />
+            <Metric label="Máx. feromona" value={snapshot.stats.foodPheromoneMaxIntensity.toFixed(1)} />
+            <Metric label="Último depósito" value={snapshot.stats.foodPheromoneLastDepositTick ?? '—'} />
           </div>
           <section className="mt-3 rounded border border-slate-800 bg-slate-900/80 p-2 text-xs">
             <div className="flex items-center justify-between gap-2">
