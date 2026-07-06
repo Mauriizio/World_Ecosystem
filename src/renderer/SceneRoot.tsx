@@ -53,12 +53,19 @@ class AntModelBoundary extends Component<AntModelBoundaryProps, AntModelBoundary
 }
 
 const antModelPath = '/models/ant.glb';
+const antVisualHeight = 0.015;
+const antModelScale = 0.012;
+const antCarryingFoodModelScale = 0.015;
+const antFallbackRadius = 0.045;
+const antCarryingFoodFallbackRadius = 0.055;
+const selectedAntRingInnerRadius = 0.08;
+const selectedAntRingOuterRadius = 0.11;
 
 const antRotationY = (ant: AntSnapshot): number => Math.atan2(ant.direction.x, ant.direction.z);
 
 const AntFallback = ({ ant, selectedEntityId }: Readonly<{ ant: AntSnapshot; selectedEntityId: string | null }>) => (
   <mesh>
-    <sphereGeometry args={[ant.carryingFood ? 0.36 : 0.28, 16, 16]} />
+    <sphereGeometry args={[ant.carryingFood ? antCarryingFoodFallbackRadius : antFallbackRadius, 16, 16]} />
     <meshStandardMaterial color={selectedEntityId === ant.id ? '#38bdf8' : '#020617'} roughness={0.65} />
   </mesh>
 );
@@ -72,18 +79,18 @@ const AntGlbModel = ({ scale }: Readonly<{ scale: number }>) => {
 const AntVisual = ({ ant, selectedEntityId }: Readonly<{ ant: AntSnapshot; selectedEntityId: string | null }>) => {
   const fallback = <AntFallback ant={ant} selectedEntityId={selectedEntityId} />;
 
-  const modelScale = ant.carryingFood ? 0.42 : 0.36;
+  const modelScale = ant.carryingFood ? antCarryingFoodModelScale : antModelScale;
 
   return (
-    <group position={[ant.position.x, 0.08, ant.position.z]} rotation={[0, antRotationY(ant), 0]}>
+    <group position={[ant.position.x, antVisualHeight, ant.position.z]} rotation={[0, antRotationY(ant), 0]}>
       <AntModelBoundary fallback={fallback}>
         <Suspense fallback={fallback}>
           <AntGlbModel scale={modelScale} />
         </Suspense>
       </AntModelBoundary>
       {selectedEntityId === ant.id && (
-        <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.55, 0.7, 24]} />
+        <mesh position={[0, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[selectedAntRingInnerRadius, selectedAntRingOuterRadius, 24]} />
           <meshBasicMaterial color="#38bdf8" opacity={0.65} transparent />
         </mesh>
       )}
