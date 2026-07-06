@@ -6,6 +6,7 @@ export type {
   AntState,
   Food,
   LabIntervention,
+  LabInterventionQueueResult,
   LabInterventionResult,
   Nest,
   ReadonlyWorldSnapshot,

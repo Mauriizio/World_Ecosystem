@@ -69,6 +69,7 @@ export const createInitialWorld = ({ seed, antCount = 20 }: InitialWorldOptions)
     nests: [nest],
     colonies: [colony],
     events: [{ tick: 0, type: 'experiment-reset', message: 'Experimento inicial creado.' }],
+    pendingLabInterventions: [],
     stats: {
       antCount: ants.length,
       foodSources: foods.length,

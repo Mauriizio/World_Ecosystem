@@ -1,5 +1,11 @@
 import { createRendererSnapshot } from './rendererBridge';
-import type { LabIntervention, LabInterventionResult, SimulationEvent, WorldState } from '../world/worldTypes';
+import type {
+  LabIntervention,
+  LabInterventionQueueResult,
+  LabInterventionResult,
+  SimulationEvent,
+  WorldState
+} from '../world/worldTypes';
 
 const maxEvents = 120;
 
@@ -11,7 +17,7 @@ const pushEvent = (world: WorldState, event: SimulationEvent): void => {
   world.events = [...world.events, event].slice(-maxEvents);
 };
 
-export const applyLabIntervention = (world: WorldState, intervention: LabIntervention): LabInterventionResult => {
+const applySingleLabIntervention = (world: WorldState, intervention: LabIntervention): LabInterventionResult => {
   if (intervention.type === 'ant-scalar-override') {
     const ant = world.ants.find((candidate) => candidate.id === intervention.antId);
     if (!ant) {
@@ -47,5 +53,31 @@ export const applyLabIntervention = (world: WorldState, intervention: LabInterve
     applied: false,
     snapshot: createRendererSnapshot(world),
     message: 'Intervención de laboratorio no reconocida.'
+  };
+};
+
+export const enqueueLabIntervention = (world: WorldState, intervention: LabIntervention): LabInterventionQueueResult => {
+  world.pendingLabInterventions = [...world.pendingLabInterventions, intervention];
+  return {
+    queued: true,
+    queueLength: world.pendingLabInterventions.length,
+    snapshot: createRendererSnapshot(world),
+    message: 'Intervención de laboratorio encolada.'
+  };
+};
+
+export const applyQueuedLabInterventions = (world: WorldState): LabInterventionResult[] => {
+  const queuedInterventions = world.pendingLabInterventions;
+  world.pendingLabInterventions = [];
+  return queuedInterventions.map((intervention) => applySingleLabIntervention(world, intervention));
+};
+
+export const applyLabIntervention = (world: WorldState, intervention: LabIntervention): LabInterventionResult => {
+  enqueueLabIntervention(world, intervention);
+  const results = applyQueuedLabInterventions(world);
+  return results.at(-1) ?? {
+    applied: false,
+    snapshot: createRendererSnapshot(world),
+    message: 'No se aplicó ninguna intervención de laboratorio.'
   };
 };

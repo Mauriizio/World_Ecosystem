@@ -71,6 +71,13 @@ export type LabInterventionResult = Readonly<{
   message: string;
 }>;
 
+export type LabInterventionQueueResult = Readonly<{
+  queued: boolean;
+  queueLength: number;
+  snapshot: ReadonlyWorldSnapshot;
+  message: string;
+}>;
+
 export type WorldStats = Readonly<{
   antCount: number;
   foodSources: number;
@@ -90,6 +97,7 @@ export type WorldState = {
   nests: Nest[];
   colonies: Colony[];
   events: SimulationEvent[];
+  pendingLabInterventions: LabIntervention[];
   stats: WorldStats;
 };
 
