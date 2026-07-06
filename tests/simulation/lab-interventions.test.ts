@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createSimulation } from '../../src/simulation';
+import { createExperimentExport } from '../../src/ui/export/exportExperiment';
 
 const runExperimentWithQueuedOverrides = () => {
   const simulation = createSimulation({ seed: 20260706, antCount: 20 });
@@ -121,6 +122,27 @@ describe('intervenciones experimentales de laboratorio', () => {
     expect(second).toEqual(first);
     expect(first.events.filter((event) => event.type === 'environmental-intervention')).toHaveLength(2);
     expect(first.interventionHistory.filter((entry) => entry.type === 'place-food')).toHaveLength(2);
+  });
+
+  it('exporta datos del experimento sin modificar el snapshot de simulación', () => {
+    const simulation = createSimulation({ seed: 20260706, antCount: 20 });
+    simulation.applyLabIntervention({ type: 'place-food', position: { x: 12.4, z: -8.2 }, amount: 10 });
+
+    const before = simulation.snapshot();
+    const exported = createExperimentExport(before, '2026-07-06T00:00:00.000Z');
+    const after = simulation.snapshot();
+
+    expect(after).toEqual(before);
+    expect(exported).toMatchObject({
+      schemaVersion: 'experiment-export-v0.1',
+      exportedAt: '2026-07-06T00:00:00.000Z',
+      seed: before.experiment.seed,
+      currentTick: before.experiment.currentTick,
+      statistics: before.stats,
+      replayStatus: 'pending'
+    });
+    expect(exported.interventionHistory).toEqual(before.interventionHistory);
+    expect(exported.events).toEqual(before.events);
   });
 
   it('limita hambre y energía al rango observable de 0 a 100', () => {
