@@ -30,6 +30,11 @@ export type Ant = {
   age: number;
   state: AntState;
   carryingFood: boolean;
+  knownFoodSourceId?: EntityId;
+  knownFoodSourcePosition?: Vector2;
+  knownFoodSourceAmountSeen?: number;
+  lastFoodSuccessTick?: number;
+  failedFoodMemoryTicks?: number;
 };
 
 export type Food = {
@@ -129,6 +134,7 @@ export type FoodPheromoneCell = {
   key: string;
   center: Vector2;
   intensity: number;
+  trailDirection: Vector2;
 };
 
 export type FoodPheromoneGrid = {

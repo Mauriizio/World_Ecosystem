@@ -49,7 +49,8 @@ export const createInitialWorld = ({
     hunger: 0,
     age: 0,
     state: 'exploring',
-    carryingFood: false
+    carryingFood: false,
+    failedFoodMemoryTicks: 0
   }));
 
   const foods: Food[] = [
