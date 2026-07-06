@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createInitialExperiment } from '../experiments/initialScenario';
 import { SceneRoot } from '../renderer/SceneRoot';
-import type { ReadonlyWorldSnapshot, SimulationRuntime } from '../simulation';
+import type { LabIntervention, ReadonlyWorldSnapshot, SimulationRuntime } from '../simulation';
 import { useUiStore } from '../state/uiStore';
 import type { PlaybackSpeed } from '../state/uiStore';
 import { TopBar } from '../ui/controls/TopBar';
@@ -26,7 +26,7 @@ export const App = () => {
     }
 
     const intervalId = window.setInterval(() => {
-      let nextSnapshot = snapshot;
+      let nextSnapshot = simulationRef.current.snapshot();
       for (let index = 0; index < speed; index += 1) {
         nextSnapshot = simulationRef.current.tick();
       }
@@ -34,7 +34,7 @@ export const App = () => {
     }, 250);
 
     return () => window.clearInterval(intervalId);
-  }, [isPlaying, speed, snapshot]);
+  }, [isPlaying, speed]);
 
   const resetExperiment = () => {
     simulationRef.current = createInitialExperiment();
@@ -43,30 +43,35 @@ export const App = () => {
     setPlaying(false);
   };
 
-  const runSingleTick = (nextSpeed: PlaybackSpeed) => {
+  const applyLabIntervention = (intervention: LabIntervention) => {
+    const result = simulationRef.current.applyLabIntervention(intervention);
+    setSnapshot(result.snapshot);
+  };
+
+  const changeSpeed = (nextSpeed: PlaybackSpeed) => {
     setSpeed(nextSpeed);
   };
 
   return (
-    <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
+    <div className="flex h-screen min-w-[1100px] flex-col bg-slate-950 text-slate-100">
       <TopBar
         isPlaying={isPlaying}
         speed={speed}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
-        onSpeedChange={runSingleTick}
+        onSpeedChange={changeSpeed}
         onReset={resetExperiment}
         onNewExperiment={resetExperiment}
       />
-      <main className="flex min-h-0 flex-1">
+      <main className="flex min-h-0 flex-1 overflow-hidden">
         <LeftPanel snapshot={snapshot} selectedEntityId={selectedEntityId} onSelect={selectEntity} />
-        <section className="relative min-w-0 flex-1">
+        <section className="relative min-w-0 flex-1 bg-slate-950">
           <SceneRoot snapshot={snapshot} />
-          <div className="pointer-events-none absolute left-4 top-4 w-72">
+          <div className="pointer-events-auto absolute right-4 top-4">
             <StatsPanel snapshot={snapshot} />
           </div>
         </section>
-        <RightInspector snapshot={snapshot} selectedEntityId={selectedEntityId} />
+        <RightInspector snapshot={snapshot} selectedEntityId={selectedEntityId} onApplyLabIntervention={applyLabIntervention} />
       </main>
       <EventLog snapshot={snapshot} />
     </div>

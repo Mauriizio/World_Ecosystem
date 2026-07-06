@@ -1,5 +1,5 @@
 import type { SeededRandom } from '../random/seededRandom';
-import type { ReadonlyWorldSnapshot, WorldState } from '../world/worldTypes';
+import type { LabIntervention, LabInterventionResult, ReadonlyWorldSnapshot, WorldState } from '../world/worldTypes';
 
 export type SimulationConfig = Readonly<{
   seed: number;
@@ -12,4 +12,5 @@ export type SimulationRuntime = {
   readonly world: WorldState;
   tick: () => ReadonlyWorldSnapshot;
   snapshot: () => ReadonlyWorldSnapshot;
+  applyLabIntervention: (intervention: LabIntervention) => LabInterventionResult;
 };

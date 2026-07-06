@@ -8,12 +8,12 @@ type SceneRootProps = Readonly<{
 }>;
 
 export const SceneRoot = ({ snapshot }: SceneRootProps) => (
-  <Canvas camera={{ position: [0, 28, 32], fov: 45 }} shadows>
+  <Canvas camera={{ position: [0, 32, 36], fov: 42 }} shadows>
     <color args={['#020617']} attach="background" />
     <ambientLight intensity={0.55} />
     <directionalLight intensity={1.2} position={[12, 20, 8]} />
     <SimulationView snapshot={snapshot} />
-    <OrbitControls enableDamping makeDefault />
+    <OrbitControls enableDamping makeDefault maxDistance={70} minDistance={12} />
   </Canvas>
 );
 

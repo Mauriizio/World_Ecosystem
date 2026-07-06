@@ -16,13 +16,19 @@ const collectSourceFiles = (directory: string): string[] =>
   });
 
 describe('fronteras de imports del núcleo de simulación', () => {
-  it('no importa React, Three.js, R3F, Drei ni Zustand desde src/simulation', () => {
+  it('no importa React, React DOM, Three.js, R3F, Drei ni Zustand desde src/simulation', () => {
     const violations = collectSourceFiles(simulationRoot).flatMap((filePath) => {
       const source = readFileSync(filePath, 'utf8');
       return forbiddenImports
         .filter((dependency) => source.includes(`from '${dependency}'`) || source.includes(`from "${dependency}"`))
         .map((dependency) => `${filePath} importa ${dependency}`);
     });
+
+    expect(violations).toEqual([]);
+  });
+
+  it('no usa Math.random dentro de src/simulation', () => {
+    const violations = collectSourceFiles(simulationRoot).filter((filePath) => readFileSync(filePath, 'utf8').includes('Math.random'));
 
     expect(violations).toEqual([]);
   });

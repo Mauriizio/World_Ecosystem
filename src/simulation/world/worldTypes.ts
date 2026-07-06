@@ -14,6 +14,8 @@ export type WorldBounds = Readonly<{
 
 export type AntState = 'exploring' | 'seekingFood' | 'returningToNest';
 
+export type AntScalarOverrideField = 'hunger' | 'energy';
+
 export type Ant = {
   id: EntityId;
   colonyId: EntityId;
@@ -49,9 +51,24 @@ export type Colony = {
 
 export type SimulationEvent = Readonly<{
   tick: number;
-  type: 'food-detected' | 'food-picked' | 'food-delivered' | 'experiment-reset';
+  type: 'food-detected' | 'food-picked' | 'food-delivered' | 'experiment-reset' | 'experimental-override';
   message: string;
   entityId?: EntityId;
+}>;
+
+export type AntScalarOverride = Readonly<{
+  type: 'ant-scalar-override';
+  antId: EntityId;
+  field: AntScalarOverrideField;
+  value: number;
+}>;
+
+export type LabIntervention = AntScalarOverride;
+
+export type LabInterventionResult = Readonly<{
+  applied: boolean;
+  snapshot: ReadonlyWorldSnapshot;
+  message: string;
 }>;
 
 export type WorldStats = Readonly<{
