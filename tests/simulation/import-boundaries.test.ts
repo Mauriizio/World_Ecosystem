@@ -6,7 +6,7 @@ const simulationRoot = join(process.cwd(), 'src', 'simulation');
 const forbiddenImports = ['react', 'react-dom', 'three', '@react-three/fiber', '@react-three/drei', 'zustand'];
 
 const collectSourceFiles = (directory: string): string[] =>
-  readdirSync(directory).flatMap((entry) => {
+  readdirSync(directory).flatMap((entry: string) => {
     const fullPath = join(directory, entry);
     const stats = statSync(fullPath);
     if (stats.isDirectory()) {
