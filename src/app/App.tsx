@@ -53,7 +53,7 @@ export const App = () => {
   };
 
   return (
-    <div className="flex h-screen min-w-[1100px] flex-col bg-slate-950 text-slate-100">
+    <div className="flex h-screen min-w-[1180px] flex-col overflow-hidden bg-slate-950 text-slate-100">
       <TopBar
         isPlaying={isPlaying}
         speed={speed}
@@ -63,11 +63,11 @@ export const App = () => {
         onReset={resetExperiment}
         onNewExperiment={resetExperiment}
       />
-      <main className="flex min-h-0 flex-1 overflow-hidden">
+      <main className="grid min-h-0 flex-1 grid-cols-[20rem_minmax(0,1fr)_24rem] overflow-hidden">
         <LeftPanel snapshot={snapshot} selectedEntityId={selectedEntityId} onSelect={selectEntity} />
-        <section className="relative min-w-0 flex-1 bg-slate-950">
+        <section className="relative min-w-0 overflow-hidden bg-slate-950">
           <SceneRoot snapshot={snapshot} />
-          <div className="pointer-events-auto absolute right-4 top-4">
+          <div className="pointer-events-auto absolute right-5 top-5">
             <StatsPanel snapshot={snapshot} />
           </div>
         </section>

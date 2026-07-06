@@ -62,7 +62,7 @@ export const RightInspector = ({ snapshot, selectedEntityId, onApplyLabIntervent
             <Row label="Hambre" value={selectedAnt.hunger.toFixed(2)} />
             <Row label="Edad" value={selectedAnt.age.toFixed(0)} />
           </Section>
-          <Section title="Overrides experimentales">
+          <Section title="Intervenciones experimentales">
             <p className="mb-3 text-xs leading-relaxed text-slate-400">Modo Laboratorio: modifica variables existentes para observar consecuencias. No ordena decisiones, rutas ni tareas.</p>
             <OverrideControl label="Hambre" value={hunger} onChange={setHunger} onApply={() => applyOverride('hunger', hunger)} />
             <OverrideControl label="Energía" value={energy} onChange={setEnergy} onApply={() => applyOverride('energy', energy)} />

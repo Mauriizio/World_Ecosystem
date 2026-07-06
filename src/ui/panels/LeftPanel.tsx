@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { ReadonlyWorldSnapshot } from '../../simulation';
 import { antStateLabels } from '../presentation/labels';
 
@@ -10,33 +11,30 @@ type LeftPanelProps = Readonly<{
 const futureTools = ['Colocar comida', 'Cambiar humedad', 'Provocar lluvia', 'Agregar obstáculo', 'Introducir organismo'];
 
 export const LeftPanel = ({ snapshot, selectedEntityId, onSelect }: LeftPanelProps) => (
-  <aside className="w-80 shrink-0 overflow-hidden border-r border-slate-800 bg-slate-950/90 p-4">
-    <div className="flex h-full min-h-0 flex-col gap-4">
-      <section>
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-300">Herramientas de laboratorio</h2>
-        <div className="mt-3 space-y-2">
-          <button className="w-full rounded border border-cyan-700 bg-cyan-950 px-3 py-2 text-left text-sm text-cyan-100" onClick={() => onSelect(null)}>
+  <aside className="w-80 shrink-0 border-r border-slate-800 bg-slate-950/95 p-3">
+    <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)_minmax(8rem,0.55fr)] gap-3">
+      <PanelSection title="Herramientas de laboratorio" tone="cyan">
+        <div className="space-y-2">
+          <button className="w-full rounded border border-cyan-700 bg-cyan-950 px-3 py-2 text-left text-sm text-cyan-100 hover:bg-cyan-900" onClick={() => onSelect(null)}>
             Inspección ambiental
           </button>
           <div className="rounded border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-300">Inspector de entidad</div>
-          <div className="rounded border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-300">Overrides experimentales desde inspector</div>
+          <div className="rounded border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-300">Intervenciones experimentales desde inspector</div>
         </div>
-      </section>
+      </PanelSection>
 
-      <section>
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">Herramientas futuras</h3>
-        <div className="mt-2 grid gap-1">
+      <PanelSection title="Herramientas futuras" tone="slate">
+        <div className="max-h-32 space-y-1 overflow-auto pr-1">
           {futureTools.map((tool) => (
-            <button className="cursor-not-allowed rounded border border-slate-800 bg-slate-900/40 px-3 py-2 text-left text-xs text-slate-500" disabled key={tool}>
+            <button className="w-full cursor-not-allowed rounded border border-slate-800 bg-slate-900/40 px-3 py-2 text-left text-xs text-slate-500" disabled key={tool}>
               {tool} · pendiente v0.2+
             </button>
           ))}
         </div>
-      </section>
+      </PanelSection>
 
-      <section className="min-h-0 flex-1">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-cyan-300">Hormigas</h3>
-        <div className="mt-2 max-h-64 space-y-1 overflow-auto pr-1">
+      <PanelSection title={`Hormigas (${snapshot.ants.length})`} tone="cyan" scrollable>
+        <div className="space-y-1 pr-1">
           {snapshot.ants.map((ant) => (
             <button
               className={`w-full rounded px-2 py-1.5 text-left text-xs ${selectedEntityId === ant.id ? 'bg-cyan-600 text-white' : 'bg-slate-900 text-slate-300 hover:bg-slate-800'}`}
@@ -47,11 +45,10 @@ export const LeftPanel = ({ snapshot, selectedEntityId, onSelect }: LeftPanelPro
             </button>
           ))}
         </div>
-      </section>
+      </PanelSection>
 
-      <section>
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-emerald-300">Recursos y nido</h3>
-        <div className="mt-2 space-y-1">
+      <PanelSection title="Recursos y nido" tone="emerald" scrollable>
+        <div className="space-y-1 pr-1">
           {snapshot.nests.map((nest) => (
             <button className="w-full rounded bg-slate-900 px-2 py-1.5 text-left text-xs text-slate-300 hover:bg-slate-800" key={nest.id} onClick={() => onSelect(nest.id)}>
               {nest.id} · reserva {nest.storedFood}
@@ -63,7 +60,25 @@ export const LeftPanel = ({ snapshot, selectedEntityId, onSelect }: LeftPanelPro
             </button>
           ))}
         </div>
-      </section>
+      </PanelSection>
     </div>
   </aside>
+);
+
+const toneClasses = {
+  cyan: 'text-cyan-300',
+  emerald: 'text-emerald-300',
+  slate: 'text-slate-500'
+} as const;
+
+const PanelSection = ({
+  title,
+  tone,
+  scrollable = false,
+  children
+}: Readonly<{ title: string; tone: keyof typeof toneClasses; scrollable?: boolean; children: ReactNode }>) => (
+  <section className="flex min-h-0 flex-col rounded-lg border border-slate-800 bg-slate-950/70 p-3 shadow-inner shadow-black/20">
+    <h2 className={`mb-2 shrink-0 text-xs font-semibold uppercase tracking-widest ${toneClasses[tone]}`}>{title}</h2>
+    <div className={scrollable ? 'min-h-0 flex-1 overflow-auto' : 'shrink-0'}>{children}</div>
+  </section>
 );
