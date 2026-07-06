@@ -1,0 +1,20 @@
+import type { SeededRandom } from '../random/seededRandom';
+import type { LabIntervention, LabInterventionQueueResult, LabInterventionResult, ReadonlyWorldSnapshot, WorldState } from '../world/worldTypes';
+
+export type SimulationConfig = Readonly<{
+  seed: number;
+  antCount: number;
+  experimentId: string;
+  experimentName: string;
+  initialEventMessage: string;
+}>;
+
+export type SimulationRuntime = {
+  readonly config: SimulationConfig;
+  readonly random: SeededRandom;
+  readonly world: WorldState;
+  tick: () => ReadonlyWorldSnapshot;
+  snapshot: () => ReadonlyWorldSnapshot;
+  enqueueLabIntervention: (intervention: LabIntervention) => LabInterventionQueueResult;
+  applyLabIntervention: (intervention: LabIntervention) => LabInterventionResult;
+};
