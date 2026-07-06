@@ -25,5 +25,36 @@ describe('simulación determinista', () => {
     expect(snapshot.nests).toHaveLength(1);
     expect(snapshot.colonies).toHaveLength(1);
     expect(snapshot.foods.length).toBeGreaterThan(0);
+    expect(snapshot.experiment.seed).toBe(20260706);
+    expect(snapshot.experiment.mode).toBe('sandbox');
+  });
+
+  it('crear una simulación con la misma seed produce el mismo estado inicial', () => {
+    const first = createSimulation({ seed: 3456, antCount: 20 }).snapshot();
+    const second = createSimulation({ seed: 3456, antCount: 20 }).snapshot();
+
+    expect(second).toEqual(first);
+  });
+
+  it('reiniciar con la misma seed reproduce el estado inicial del experimento', () => {
+    const simulation = createSimulation({ seed: 4567, antCount: 20 });
+    const initial = simulation.snapshot();
+    simulation.tick();
+    simulation.tick();
+
+    const restarted = createSimulation({ seed: simulation.config.seed, antCount: simulation.config.antCount }).snapshot();
+
+    expect(restarted.ants).toEqual(initial.ants);
+    expect(restarted.foods).toEqual(initial.foods);
+    expect(restarted.experiment.seed).toBe(initial.experiment.seed);
+  });
+
+  it('un nuevo experimento puede recibir una seed distinta', () => {
+    const first = createSimulation({ seed: 1111, antCount: 20 }).snapshot();
+    const second = createSimulation({ seed: 2222, antCount: 20 }).snapshot();
+
+    expect(second.experiment.seed).toBe(2222);
+    expect(second.experiment.seed).not.toBe(first.experiment.seed);
+    expect(second.ants).not.toEqual(first.ants);
   });
 });

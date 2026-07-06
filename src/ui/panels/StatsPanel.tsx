@@ -15,15 +15,24 @@ export const StatsPanel = ({ snapshot }: Readonly<{ snapshot: ReadonlyWorldSnaps
       </button>
       {isExpanded && (
         <div className="p-3">
+          <div className="mb-3 rounded border border-cyan-950/80 bg-slate-900/80 p-2 text-xs">
+            <div className="text-slate-500">Experimento</div>
+            <div className="truncate font-semibold text-slate-100">{snapshot.experiment.experimentId}</div>
+            <div className="mt-1 grid grid-cols-2 gap-2 text-slate-400">
+              <span>Seed {snapshot.experiment.seed}</span>
+              <span>{snapshot.experiment.mode === 'sandbox' ? 'Sandbox experimental' : 'Natural'}</span>
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <Metric label="Tick" value={snapshot.tick} />
+            <Metric label="Tick" value={snapshot.experiment.currentTick} />
             <Metric label="Tiempo" value={snapshot.simulatedTime.toFixed(0)} />
             <Metric label="Hormigas" value={snapshot.stats.antCount} />
             <Metric label="Fuentes" value={snapshot.stats.foodSources} />
             <Metric label="Comida total" value={snapshot.stats.totalFoodAmount} />
             <Metric label="Reserva nido" value={snapshot.stats.nestStoredFood} />
+            <Metric label="Intervenciones" value={snapshot.experiment.interventionCount} />
           </div>
-          <p className="mt-3 rounded border border-slate-800 bg-slate-900/80 p-2 text-xs leading-relaxed text-slate-400">v0.1: población fija. Reproducción y mortalidad están pendientes.</p>
+          <p className="mt-3 rounded border border-slate-800 bg-slate-900/80 p-2 text-xs leading-relaxed text-slate-400">v0.1: población fija. Reproducción y mortalidad están pendientes. Replay y guardado pendientes.</p>
         </div>
       )}
     </section>

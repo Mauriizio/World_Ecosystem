@@ -4,6 +4,9 @@ import type { Ant, Colony, Food, Nest, WorldBounds, WorldState } from './worldTy
 export type InitialWorldOptions = Readonly<{
   seed: number;
   antCount?: number;
+  experimentId?: string;
+  experimentName?: string;
+  initialEventMessage?: string;
 }>;
 
 const bounds: WorldBounds = {
@@ -13,7 +16,13 @@ const bounds: WorldBounds = {
   maxZ: 24
 };
 
-export const createInitialWorld = ({ seed, antCount = 20 }: InitialWorldOptions): WorldState => {
+export const createInitialWorld = ({
+  seed,
+  antCount = 20,
+  experimentId = `experiment-${seed}`,
+  experimentName = 'Experimento sandbox inicial',
+  initialEventMessage = `Experimento creado con seed ${seed}.`
+}: InitialWorldOptions): WorldState => {
   const random = createSeededRandom(seed);
   const colonyId = 'colony-001';
   const nestId = 'nest-001';
@@ -63,13 +72,23 @@ export const createInitialWorld = ({ seed, antCount = 20 }: InitialWorldOptions)
     tick: 0,
     simulatedTime: 0,
     tickDuration: 1,
+    experiment: {
+      experimentId,
+      experimentName,
+      seed,
+      startTick: 0,
+      currentTick: 0,
+      interventionCount: 0,
+      mode: 'sandbox'
+    },
     bounds,
     ants,
     foods,
     nests: [nest],
     colonies: [colony],
-    events: [{ tick: 0, type: 'experiment-reset', message: 'Experimento inicial creado.' }],
+    events: [{ tick: 0, type: 'experiment-reset', message: initialEventMessage }],
     pendingLabInterventions: [],
+    interventionHistory: [],
     stats: {
       antCount: ants.length,
       foodSources: foods.length,

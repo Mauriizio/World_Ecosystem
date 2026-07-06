@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createInitialExperiment } from '../experiments/initialScenario';
 import { SceneRoot } from '../renderer/SceneRoot';
+import { createSimulation } from '../simulation';
 import type { LabIntervention, ReadonlyWorldSnapshot, SimulationRuntime } from '../simulation';
 import { useUiStore } from '../state/uiStore';
 import type { PlaybackSpeed } from '../state/uiStore';
@@ -40,7 +41,28 @@ export const App = () => {
   }, [isPlaying, speed]);
 
   const resetExperiment = () => {
-    simulationRef.current = createInitialExperiment();
+    const { seed, antCount, experimentId, experimentName } = simulationRef.current.config;
+    simulationRef.current = createSimulation({
+      seed,
+      antCount,
+      experimentId,
+      experimentName,
+      initialEventMessage: `Experimento reiniciado con la misma seed ${seed}.`
+    });
+    setSnapshot(simulationRef.current.snapshot());
+    selectEntity(null);
+    setPlaying(false);
+  };
+
+  const newExperiment = () => {
+    const nextSeed = simulationRef.current.config.seed + 1;
+    simulationRef.current = createSimulation({
+      seed: nextSeed,
+      antCount: simulationRef.current.config.antCount,
+      experimentId: `experiment-${nextSeed}`,
+      experimentName: 'Experimento sandbox inicial',
+      initialEventMessage: `Nuevo experimento creado con seed ${nextSeed}.`
+    });
     setSnapshot(simulationRef.current.snapshot());
     selectEntity(null);
     setPlaying(false);
@@ -64,7 +86,7 @@ export const App = () => {
         onPause={() => setPlaying(false)}
         onSpeedChange={changeSpeed}
         onReset={resetExperiment}
-        onNewExperiment={resetExperiment}
+        onNewExperiment={newExperiment}
       />
       <main className="grid min-h-0 flex-1 grid-cols-[20rem_minmax(0,1fr)_24rem] overflow-hidden">
         <LeftPanel snapshot={snapshot} selectedEntityId={selectedEntityId} activeTool={activeTool} onSelect={selectEntity} onToolSelect={setActiveTool} />

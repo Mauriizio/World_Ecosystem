@@ -78,6 +78,14 @@ describe('intervenciones experimentales de laboratorio', () => {
     expect(after.stats.foodSources).toBe(before.stats.foodSources + 1);
     expect(after.stats.totalFoodAmount).toBe(before.stats.totalFoodAmount + 10);
     expect(after.events.at(-1)?.message).toBe('Intervención ambiental: comida colocada en x=12.4, z=-8.2, cantidad=10.');
+    expect(after.interventionHistory.at(-1)).toMatchObject({
+      type: 'place-food',
+      requestedTick: 0,
+      appliedTick: 0,
+      source: 'user-laboratory',
+      payload: { foodId: createdFood?.id, x: 12.4, z: -8.2, amount: 10 }
+    });
+    expect(after.experiment.interventionCount).toBe(1);
   });
 
   it('aplica dos intervenciones de colocar comida en orden', () => {
@@ -94,6 +102,7 @@ describe('intervenciones experimentales de laboratorio', () => {
       { x: -20, z: -20 }
     ]);
     expect(placedFoods.map((food) => food.amount)).toEqual([10, 7]);
+    expect(simulation.snapshot().interventionHistory.map((entry) => entry.payload.foodId)).toEqual(['food-005', 'food-006']);
   });
 
   it('registra overrides sin romper determinismo cuando se repite la misma secuencia', () => {
@@ -102,6 +111,7 @@ describe('intervenciones experimentales de laboratorio', () => {
 
     expect(second).toEqual(first);
     expect(first.events.some((event) => event.type === 'experimental-override')).toBe(true);
+    expect(first.interventionHistory.filter((entry) => entry.type === 'ant-scalar-override')).toHaveLength(2);
   });
 
   it('mantiene determinismo al repetir la misma secuencia de colocar comida', () => {
@@ -110,6 +120,7 @@ describe('intervenciones experimentales de laboratorio', () => {
 
     expect(second).toEqual(first);
     expect(first.events.filter((event) => event.type === 'environmental-intervention')).toHaveLength(2);
+    expect(first.interventionHistory.filter((entry) => entry.type === 'place-food')).toHaveLength(2);
   });
 
   it('limita hambre y energía al rango observable de 0 a 100', () => {
@@ -120,5 +131,6 @@ describe('intervenciones experimentales de laboratorio', () => {
 
     expect(ant?.hunger).toBe(100);
     expect(ant?.energy).toBe(0);
+    expect(simulation.snapshot().interventionHistory.map((entry) => entry.payload.value)).toEqual([100, 0]);
   });
 });

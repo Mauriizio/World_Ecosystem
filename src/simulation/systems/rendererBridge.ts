@@ -12,11 +12,13 @@ export const createRendererSnapshot = (world: WorldState): ReadonlyWorldSnapshot
     seed: world.seed,
     tick: world.tick,
     simulatedTime: world.simulatedTime,
+    experiment: world.experiment,
     bounds: world.bounds,
     ants: world.ants,
     foods: world.foods,
     nests: world.nests,
     colonies: world.colonies,
     events: world.events,
+    interventionHistory: world.interventionHistory,
     stats: world.stats
   }));

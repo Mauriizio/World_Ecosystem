@@ -4,6 +4,9 @@ import type { LabIntervention, LabInterventionQueueResult, LabInterventionResult
 export type SimulationConfig = Readonly<{
   seed: number;
   antCount: number;
+  experimentId: string;
+  experimentName: string;
+  initialEventMessage: string;
 }>;
 
 export type SimulationRuntime = {

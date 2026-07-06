@@ -16,6 +16,10 @@ export type AntState = 'exploring' | 'seekingFood' | 'returningToNest';
 
 export type AntScalarOverrideField = 'hunger' | 'energy';
 
+export type ExperimentMode = 'sandbox' | 'natural';
+
+export type InterventionSource = 'user-laboratory';
+
 export type Ant = {
   id: EntityId;
   colonyId: EntityId;
@@ -49,6 +53,16 @@ export type Colony = {
   deliveredFood: number;
 };
 
+export type ExperimentMetadata = Readonly<{
+  experimentId: string;
+  experimentName: string;
+  seed: number;
+  startTick: number;
+  currentTick: number;
+  interventionCount: number;
+  mode: ExperimentMode;
+}>;
+
 export type SimulationEvent = Readonly<{
   tick: number;
   type: 'food-detected' | 'food-picked' | 'food-delivered' | 'experiment-reset' | 'experimental-override' | 'environmental-intervention';
@@ -70,6 +84,33 @@ export type PlaceFoodIntervention = Readonly<{
 }>;
 
 export type LabIntervention = AntScalarOverride | PlaceFoodIntervention;
+
+export type InterventionHistoryPayload = Readonly<{
+  antId?: EntityId;
+  foodId?: EntityId;
+  field?: AntScalarOverrideField;
+  previousValue?: number;
+  value?: number;
+  x?: number;
+  z?: number;
+  amount?: number;
+}>;
+
+export type InterventionHistoryEntry = Readonly<{
+  id: string;
+  type: LabIntervention['type'];
+  requestedTick: number;
+  appliedTick: number;
+  source: InterventionSource;
+  payload: InterventionHistoryPayload;
+  message: string;
+}>;
+
+export type QueuedLabIntervention = Readonly<{
+  intervention: LabIntervention;
+  requestedTick: number;
+  source: InterventionSource;
+}>;
 
 export type LabInterventionResult = Readonly<{
   applied: boolean;
@@ -97,13 +138,15 @@ export type WorldState = {
   tick: number;
   simulatedTime: number;
   tickDuration: number;
+  experiment: ExperimentMetadata;
   bounds: WorldBounds;
   ants: Ant[];
   foods: Food[];
   nests: Nest[];
   colonies: Colony[];
   events: SimulationEvent[];
-  pendingLabInterventions: LabIntervention[];
+  pendingLabInterventions: QueuedLabIntervention[];
+  interventionHistory: InterventionHistoryEntry[];
   stats: WorldStats;
 };
 
@@ -111,11 +154,13 @@ export type ReadonlyWorldSnapshot = Readonly<{
   seed: number;
   tick: number;
   simulatedTime: number;
+  experiment: ExperimentMetadata;
   bounds: WorldBounds;
   ants: readonly Readonly<Ant>[];
   foods: readonly Readonly<Food>[];
   nests: readonly Readonly<Nest>[];
   colonies: readonly Readonly<Colony>[];
   events: readonly SimulationEvent[];
+  interventionHistory: readonly InterventionHistoryEntry[];
   stats: WorldStats;
 }>;
