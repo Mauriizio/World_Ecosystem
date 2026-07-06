@@ -9,7 +9,9 @@ export type {
   LabInterventionQueueResult,
   LabInterventionResult,
   Nest,
+  PlaceFoodIntervention,
   ReadonlyWorldSnapshot,
   SimulationEvent,
+  Vector2,
   WorldStats
 } from './world/worldTypes';

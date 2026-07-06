@@ -1,25 +1,31 @@
 import type { ReactNode } from 'react';
 import type { ReadonlyWorldSnapshot } from '../../simulation';
+import type { ActiveTool } from '../../state/uiStore';
 import { antStateLabels } from '../presentation/labels';
 
 type LeftPanelProps = Readonly<{
   snapshot: ReadonlyWorldSnapshot;
   selectedEntityId: string | null;
+  activeTool: ActiveTool;
   onSelect: (id: string | null) => void;
+  onToolSelect: (tool: ActiveTool) => void;
 }>;
 
-const futureTools = ['Colocar comida', 'Cambiar humedad', 'Provocar lluvia', 'Agregar obstáculo', 'Introducir organismo'];
+const futureTools = ['Cambiar humedad', 'Provocar lluvia', 'Agregar obstáculo', 'Introducir organismo'];
 
-export const LeftPanel = ({ snapshot, selectedEntityId, onSelect }: LeftPanelProps) => (
+export const LeftPanel = ({ snapshot, selectedEntityId, activeTool, onSelect, onToolSelect }: LeftPanelProps) => (
   <aside className="h-full min-h-0 w-80 shrink-0 overflow-y-auto border-r border-slate-800 bg-slate-950/95 p-3">
     <div className="flex min-h-full flex-col gap-3">
       <PanelSection title="Herramientas de laboratorio" tone="cyan">
         <div className="space-y-2">
-          <button className="w-full rounded border border-cyan-700 bg-cyan-950 px-3 py-2 text-left text-sm text-cyan-100 hover:bg-cyan-900" onClick={() => onSelect(null)}>
+          <button className={`w-full rounded border px-3 py-2 text-left text-sm ${activeTool === 'inspect' ? 'border-cyan-500 bg-cyan-900 text-white' : 'border-cyan-700 bg-cyan-950 text-cyan-100 hover:bg-cyan-900'}`} onClick={() => { onToolSelect('inspect'); onSelect(null); }}>
             Inspección ambiental
           </button>
           <div className="rounded border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-300">Inspector de entidad</div>
           <div className="rounded border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-slate-300">Intervenciones experimentales desde inspector</div>
+          <button className={`w-full rounded border px-3 py-2 text-left text-sm ${activeTool === 'place-food' ? 'border-emerald-400 bg-emerald-900 text-white' : 'border-emerald-700 bg-emerald-950 text-emerald-100 hover:bg-emerald-900'}`} onClick={() => onToolSelect('place-food')}>
+            Colocar comida · cantidad 10
+          </button>
         </div>
       </PanelSection>
 

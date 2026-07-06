@@ -51,7 +51,7 @@ export type Colony = {
 
 export type SimulationEvent = Readonly<{
   tick: number;
-  type: 'food-detected' | 'food-picked' | 'food-delivered' | 'experiment-reset' | 'experimental-override';
+  type: 'food-detected' | 'food-picked' | 'food-delivered' | 'experiment-reset' | 'experimental-override' | 'environmental-intervention';
   message: string;
   entityId?: EntityId;
 }>;
@@ -63,7 +63,13 @@ export type AntScalarOverride = Readonly<{
   value: number;
 }>;
 
-export type LabIntervention = AntScalarOverride;
+export type PlaceFoodIntervention = Readonly<{
+  type: 'place-food';
+  position: Vector2;
+  amount: number;
+}>;
+
+export type LabIntervention = AntScalarOverride | PlaceFoodIntervention;
 
 export type LabInterventionResult = Readonly<{
   applied: boolean;

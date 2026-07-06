@@ -17,9 +17,11 @@ export const App = () => {
   const isPlaying = useUiStore((state) => state.isPlaying);
   const speed = useUiStore((state) => state.speed);
   const selectedEntityId = useUiStore((state) => state.selectedEntityId);
+  const activeTool = useUiStore((state) => state.activeTool);
   const selectEntity = useUiStore((state) => state.selectEntity);
   const setPlaying = useUiStore((state) => state.setPlaying);
   const setSpeed = useUiStore((state) => state.setSpeed);
+  const setActiveTool = useUiStore((state) => state.setActiveTool);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -65,9 +67,17 @@ export const App = () => {
         onNewExperiment={resetExperiment}
       />
       <main className="grid min-h-0 flex-1 grid-cols-[20rem_minmax(0,1fr)_24rem] overflow-hidden">
-        <LeftPanel snapshot={snapshot} selectedEntityId={selectedEntityId} onSelect={selectEntity} />
+        <LeftPanel snapshot={snapshot} selectedEntityId={selectedEntityId} activeTool={activeTool} onSelect={selectEntity} onToolSelect={setActiveTool} />
         <section className="relative min-w-0 overflow-hidden bg-slate-950">
-          <SceneRoot snapshot={snapshot} resetCameraSignal={cameraResetSignal} />
+          <SceneRoot
+            snapshot={snapshot}
+            resetCameraSignal={cameraResetSignal}
+            activeTool={activeTool}
+            onPlaceFoodRequested={(position) => {
+              const result = simulationRef.current.applyLabIntervention({ type: 'place-food', position, amount: 10 });
+              setSnapshot(result.snapshot);
+            }}
+          />
           <div className="pointer-events-auto absolute left-5 top-5">
             <button
               className="rounded-lg border border-slate-700 bg-slate-950/90 px-3 py-2 text-xs font-semibold text-slate-200 shadow-lg shadow-black/30 backdrop-blur hover:bg-slate-900"

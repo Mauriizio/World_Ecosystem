@@ -1,5 +1,6 @@
 import { createSeededRandom } from '../random/seededRandom';
 import { createRendererSnapshot } from '../systems/rendererBridge';
+import { runStatisticsSystem } from '../systems/statisticsSystem';
 import { applyLabIntervention, enqueueLabIntervention } from '../systems/userInterventionSystem';
 import { createInitialWorld } from '../world/worldState';
 import { runSimulationTick } from './tick';
@@ -20,6 +21,10 @@ export const createSimulation = (config: Partial<SimulationConfig> = {}): Simula
     tick: () => runSimulationTick(world, random),
     snapshot: () => createRendererSnapshot(world),
     enqueueLabIntervention: (intervention) => enqueueLabIntervention(world, intervention),
-    applyLabIntervention: (intervention) => applyLabIntervention(world, intervention)
+    applyLabIntervention: (intervention) => {
+      const result = applyLabIntervention(world, intervention);
+      runStatisticsSystem(world);
+      return { ...result, snapshot: createRendererSnapshot(world) };
+    }
   };
 };
