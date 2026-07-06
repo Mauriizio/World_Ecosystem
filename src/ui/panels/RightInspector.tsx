@@ -40,7 +40,7 @@ export const RightInspector = ({ snapshot, selectedEntityId, onApplyLabIntervent
   };
 
   return (
-    <aside className="w-96 shrink-0 overflow-auto border-l border-slate-800 bg-slate-950/90 p-4">
+    <aside className="h-full min-h-0 w-96 shrink-0 overflow-y-auto border-l border-slate-800 bg-slate-950/90 p-4 pb-8">
       <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-300">Inspector de entidad</h2>
       {!selectedEntityId && <p className="mt-4 rounded border border-slate-800 bg-slate-900/70 p-3 text-sm text-slate-400">Selecciona una entidad para observar su estado simulado. La inspección no modifica el mundo.</p>}
 

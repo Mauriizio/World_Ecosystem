@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import type { ReadonlyWorldSnapshot } from '../simulation';
@@ -5,26 +6,66 @@ import { useUiStore } from '../state/uiStore';
 
 type SceneRootProps = Readonly<{
   snapshot: ReadonlyWorldSnapshot;
+  resetCameraSignal: number;
 }>;
 
-export const SceneRoot = ({ snapshot }: SceneRootProps) => (
-  <Canvas camera={{ position: [0, 32, 36], fov: 42 }} shadows>
+type CameraControlsHandle = {
+  object: {
+    position: {
+      set: (x: number, y: number, z: number) => void;
+    };
+  };
+  target: {
+    set: (x: number, y: number, z: number) => void;
+  };
+  update: () => void;
+};
+
+const initialCameraPosition: [number, number, number] = [0, 58, 66];
+const cameraTarget: [number, number, number] = [0, 0, 0];
+
+export const SceneRoot = ({ snapshot, resetCameraSignal }: SceneRootProps) => (
+  <Canvas camera={{ position: initialCameraPosition, fov: 45, near: 0.1, far: 500 }} shadows>
     <color args={['#020617']} attach="background" />
     <ambientLight intensity={0.55} />
     <directionalLight intensity={1.2} position={[12, 20, 8]} />
-    <SimulationView snapshot={snapshot} />
-    <OrbitControls enableDamping makeDefault maxDistance={70} minDistance={12} />
+    <SimulationView snapshot={snapshot} resetCameraSignal={resetCameraSignal} />
   </Canvas>
 );
 
-const SimulationView = ({ snapshot }: SceneRootProps) => {
+const SimulationView = ({ snapshot, resetCameraSignal }: SceneRootProps) => {
+  const controlsRef = useRef<unknown>(null);
   const selectEntity = useUiStore((state) => state.selectEntity);
   const selectedEntityId = useUiStore((state) => state.selectedEntityId);
   const width = snapshot.bounds.maxX - snapshot.bounds.minX;
   const depth = snapshot.bounds.maxZ - snapshot.bounds.minZ;
 
+  useEffect(() => {
+    const controls = controlsRef.current as CameraControlsHandle | null;
+    if (!controls) {
+      return;
+    }
+    controls.object.position.set(...initialCameraPosition);
+    controls.target.set(...cameraTarget);
+    controls.update();
+  }, [resetCameraSignal]);
+
   return (
     <group>
+      <OrbitControls
+        ref={(controls) => {
+          controlsRef.current = controls;
+        }}
+        enableDamping
+        enablePan
+        enableZoom
+        makeDefault
+        maxDistance={140}
+        maxPolarAngle={Math.PI / 2.15}
+        minDistance={6}
+        minPolarAngle={0.25}
+        target={cameraTarget}
+      />
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[width, depth]} />
         <meshStandardMaterial color="#1e293b" />

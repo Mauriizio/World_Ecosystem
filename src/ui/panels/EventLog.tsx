@@ -17,7 +17,7 @@ export const EventLog = ({ snapshot }: Readonly<{ snapshot: ReadonlyWorldSnapsho
   const visibleEvents = [...snapshot.events].reverse().slice(0, config.limit);
 
   return (
-    <footer className={`${config.height} border-t border-slate-800 bg-slate-950/95 p-3 transition-[height]`}>
+    <footer className={`${config.height} shrink-0 border-t border-slate-800 bg-slate-950/95 p-3 transition-[height]`}>
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-300">Registro de eventos</h2>

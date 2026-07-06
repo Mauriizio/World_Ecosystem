@@ -11,7 +11,7 @@ type LeftPanelProps = Readonly<{
 const futureTools = ['Colocar comida', 'Cambiar humedad', 'Provocar lluvia', 'Agregar obstáculo', 'Introducir organismo'];
 
 export const LeftPanel = ({ snapshot, selectedEntityId, onSelect }: LeftPanelProps) => (
-  <aside className="w-80 shrink-0 border-r border-slate-800 bg-slate-950/95 p-3">
+  <aside className="h-full min-h-0 w-80 shrink-0 overflow-hidden border-r border-slate-800 bg-slate-950/95 p-3">
     <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)_minmax(8rem,0.55fr)] gap-3">
       <PanelSection title="Herramientas de laboratorio" tone="cyan">
         <div className="space-y-2">
