@@ -53,13 +53,13 @@ class AntModelBoundary extends Component<AntModelBoundaryProps, AntModelBoundary
 }
 
 const antModelPath = '/models/ant.glb';
-const antVisualHeight = 0.015;
-const antModelScale = 0.012;
-const antCarryingFoodModelScale = 0.015;
-const antFallbackRadius = 0.045;
-const antCarryingFoodFallbackRadius = 0.055;
-const selectedAntRingInnerRadius = 0.08;
-const selectedAntRingOuterRadius = 0.11;
+const antVisualHeight = 0.025;
+const antModelScale = 0.02;
+const antCarryingFoodModelScale = 0.024;
+const antFallbackRadius = 0.07;
+const antCarryingFoodFallbackRadius = 0.085;
+const selectedAntRingInnerRadius = 0.12;
+const selectedAntRingOuterRadius = 0.16;
 
 const antRotationY = (ant: AntSnapshot): number => Math.atan2(ant.direction.x, ant.direction.z);
 
@@ -89,7 +89,7 @@ const AntVisual = ({ ant, selectedEntityId }: Readonly<{ ant: AntSnapshot; selec
         </Suspense>
       </AntModelBoundary>
       {selectedEntityId === ant.id && (
-        <mesh position={[0, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[selectedAntRingInnerRadius, selectedAntRingOuterRadius, 24]} />
           <meshBasicMaterial color="#38bdf8" opacity={0.65} transparent />
         </mesh>
@@ -149,7 +149,7 @@ const SimulationView = ({ snapshot, resetCameraSignal, activeTool, onPlaceFoodRe
         makeDefault
         maxDistance={140}
         maxPolarAngle={Math.PI / 2.15}
-        minDistance={6}
+        minDistance={2.2}
         minPolarAngle={0.25}
         target={cameraTarget}
       />
