@@ -1,8 +1,8 @@
-import { Component, Suspense, useEffect, useRef, useState } from 'react';
+import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Clone, OrbitControls, useGLTF } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { MOUSE } from 'three';
+import { CanvasTexture, MOUSE, RepeatWrapping } from 'three';
 import type { ThreeEvent } from '@react-three/fiber';
 import type { ReadonlyWorldSnapshot, Vector2 } from '../simulation';
 import { useUiStore } from '../state/uiStore';
@@ -37,6 +37,49 @@ const cameraTarget: [number, number, number] = [0, 0, 0];
 const orbitMouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.PAN, RIGHT: MOUSE.PAN } as const;
 const foodPreviewHeight = 0.35;
 const pointerDragThreshold = 4;
+
+const groundTextureSize = 256;
+const groundTextureWorldRepeat = 16;
+const groundBaseColor = '#b7b98a';
+const groundPatchPalette = ['rgba(142, 126, 82, 0.16)', 'rgba(103, 126, 70, 0.12)', 'rgba(201, 185, 124, 0.14)', 'rgba(117, 101, 69, 0.1)'] as const;
+
+const createGroundTexture = (width: number, depth: number): CanvasTexture | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = groundTextureSize;
+  canvas.height = groundTextureSize;
+
+  const context = canvas.getContext('2d');
+  if (!context) {
+    return null;
+  }
+
+  context.fillStyle = groundBaseColor;
+  context.fillRect(0, 0, groundTextureSize, groundTextureSize);
+
+  for (let index = 0; index < 72; index += 1) {
+    const x = (index * 47 + 23) % groundTextureSize;
+    const y = (index * 83 + 41) % groundTextureSize;
+    const radiusX = 10 + ((index * 11) % 24);
+    const radiusY = 6 + ((index * 7) % 18);
+    const rotation = ((index * 29) % 180) * (Math.PI / 180);
+
+    context.beginPath();
+    context.ellipse(x, y, radiusX, radiusY, rotation, 0, Math.PI * 2);
+    context.fillStyle = groundPatchPalette[index % groundPatchPalette.length];
+    context.fill();
+  }
+
+  const texture = new CanvasTexture(canvas);
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.repeat.set(Math.max(1, width / groundTextureWorldRepeat), Math.max(1, depth / groundTextureWorldRepeat));
+
+  return texture;
+};
 
 type ModelBoundaryProps = Readonly<{
   children: ReactNode;
@@ -125,6 +168,11 @@ const SimulationView = ({ snapshot, resetCameraSignal, activeTool, onPlaceFoodRe
   const width = snapshot.bounds.maxX - snapshot.bounds.minX;
   const depth = snapshot.bounds.maxZ - snapshot.bounds.minZ;
   const selectedAnt = snapshot.ants.find((ant) => ant.id === selectedEntityId) ?? null;
+  const groundTexture = useMemo(() => createGroundTexture(width, depth), [width, depth]);
+
+  useEffect(() => {
+    return () => groundTexture?.dispose();
+  }, [groundTexture]);
 
   useEffect(() => {
     const controls = controlsRef.current as CameraControlsHandle | null;
@@ -265,7 +313,7 @@ const SimulationView = ({ snapshot, resetCameraSignal, activeTool, onPlaceFoodRe
         onPointerUp={handleTerrainPointerUp}
       >
         <planeGeometry args={[width, depth]} />
-        <meshStandardMaterial color="#b7b98a" roughness={0.95} />
+        <meshStandardMaterial color="#ffffff" map={groundTexture ?? undefined} roughness={0.95} />
       </mesh>
       <gridHelper args={[width, 24, '#e3e5c4', '#a5aa7a']} position={[0, 0.01, 0]} />
       {foodPreviewPosition && (
