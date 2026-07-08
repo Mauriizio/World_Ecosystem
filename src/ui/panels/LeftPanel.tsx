@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { ReadonlyWorldSnapshot } from '../../simulation';
-import type { ActiveTool } from '../../state/uiStore';
+import { useUiStore } from '../../state/uiStore';
+import type { ActiveTool, TerrainVisualPreset } from '../../state/uiStore';
 import { antStateLabels } from '../presentation/labels';
 
 type LeftPanelProps = Readonly<{
@@ -13,7 +14,22 @@ type LeftPanelProps = Readonly<{
 
 const futureTools = ['Cambiar humedad', 'Provocar lluvia', 'Agregar obstáculo', 'Introducir organismo'];
 
-export const LeftPanel = ({ snapshot, selectedEntityId, activeTool, onSelect, onToolSelect }: LeftPanelProps) => (
+const terrainVisualPresetLabels: Record<TerrainVisualPreset, string> = {
+  'lab-clear': 'Laboratorio claro',
+  'dry-sand': 'Arena seca',
+  'dry-grass': 'Pasto seco',
+  'light-soil': 'Tierra clara'
+};
+
+export const LeftPanel = ({ snapshot, selectedEntityId, activeTool, onSelect, onToolSelect }: LeftPanelProps) => {
+  const terrainVisualPreset = useUiStore((state) => state.terrainVisualPreset);
+  const setTerrainVisualPreset = useUiStore((state) => state.setTerrainVisualPreset);
+  const terrainVariation = useUiStore((state) => state.terrainVariation);
+  const regenerateTerrainVisual = useUiStore((state) => state.regenerateTerrainVisual);
+  const showTerrainGrid = useUiStore((state) => state.showTerrainGrid);
+  const setShowTerrainGrid = useUiStore((state) => state.setShowTerrainGrid);
+
+  return (
   <aside className="h-full min-h-0 w-80 shrink-0 overflow-y-auto border-r border-slate-800 bg-slate-950/95 p-3">
     <div className="flex min-h-full flex-col gap-3">
       <PanelSection title="Herramientas de laboratorio" tone="cyan">
@@ -26,6 +42,33 @@ export const LeftPanel = ({ snapshot, selectedEntityId, activeTool, onSelect, on
           <button className={`w-full rounded border px-3 py-2 text-left text-sm ${activeTool === 'place-food' ? 'border-emerald-400 bg-emerald-900 text-white' : 'border-emerald-700 bg-emerald-950 text-emerald-100 hover:bg-emerald-900'}`} onClick={() => onToolSelect('place-food')}>
             Colocar comida · cantidad 10
           </button>
+        </div>
+      </PanelSection>
+
+      <PanelSection title="Visualización del terreno" tone="slate">
+        <div className="space-y-2 text-xs text-slate-300">
+          <label className="block space-y-1">
+            <span className="font-semibold uppercase tracking-wide text-slate-400">Preset visual</span>
+            <select
+              className="w-full rounded border border-slate-700 bg-slate-900 px-2 py-2 text-slate-100 outline-none hover:border-slate-500 focus:border-cyan-500"
+              value={terrainVisualPreset}
+              onChange={(event) => setTerrainVisualPreset(event.target.value as TerrainVisualPreset)}
+            >
+              {Object.entries(terrainVisualPresetLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-left text-slate-100 hover:bg-slate-800" onClick={regenerateTerrainVisual} type="button">
+            Regenerar suelo · variación {terrainVariation + 1}
+          </button>
+          <label className="flex items-center gap-2 rounded border border-slate-800 bg-slate-900/60 px-3 py-2 text-slate-300">
+            <input checked={showTerrainGrid} className="accent-cyan-500" onChange={(event) => setShowTerrainGrid(event.target.checked)} type="checkbox" />
+            Mostrar grilla de orientación
+          </label>
+          <p className="text-[0.7rem] leading-snug text-slate-500">Solo cambia la presentación visual; no modifica terreno lógico, seed ni simulación.</p>
         </div>
       </PanelSection>
 
@@ -71,7 +114,8 @@ export const LeftPanel = ({ snapshot, selectedEntityId, activeTool, onSelect, on
       </div>
     </div>
   </aside>
-);
+  );
+};
 
 const toneClasses = {
   cyan: 'text-cyan-300',
