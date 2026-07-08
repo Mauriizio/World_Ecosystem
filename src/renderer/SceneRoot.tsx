@@ -60,7 +60,6 @@ class ModelBoundary extends Component<ModelBoundaryProps, ModelBoundaryState> {
 }
 
 const antModelPath = '/models/ant.glb';
-const terrainModelPath = '/models/terrain-tile.glb';
 const antVisualHeight = 0.025;
 const antModelScale = 0.02;
 const antCarryingFoodModelScale = 0.024;
@@ -70,34 +69,6 @@ const selectedAntRingInnerRadius = 0.12;
 const selectedAntRingOuterRadius = 0.16;
 
 const antRotationY = (ant: AntSnapshot): number => Math.atan2(ant.direction.x, ant.direction.z);
-
-
-type TerrainInteractions = Readonly<{
-  onClick: (event: ThreeEvent<MouseEvent>) => void;
-  onContextMenu: (event: ThreeEvent<MouseEvent>) => void;
-  onPointerDown: (event: ThreeEvent<PointerEvent>) => void;
-  onPointerLeave: () => void;
-  onPointerMove: (event: ThreeEvent<PointerEvent>) => void;
-  onPointerUp: () => void;
-}>;
-
-const TerrainGlbModel = ({ interactions }: Readonly<{ interactions: TerrainInteractions }>) => {
-  const { scene } = useGLTF(terrainModelPath);
-
-  return (
-    <group {...interactions} position={[0, 0.015, 0]} scale={18}>
-      <Clone object={scene} />
-    </group>
-  );
-};
-
-const TerrainTile = ({ interactions }: Readonly<{ interactions: TerrainInteractions }>) => (
-  <ModelBoundary fallback={null}>
-    <Suspense fallback={null}>
-      <TerrainGlbModel interactions={interactions} />
-    </Suspense>
-  </ModelBoundary>
-);
 
 const AntFallback = ({ ant, selectedEntityId }: Readonly<{ ant: AntSnapshot; selectedEntityId: string | null }>) => (
   <mesh>
@@ -266,15 +237,6 @@ const SimulationView = ({ snapshot, resetCameraSignal, activeTool, onPlaceFoodRe
     select();
   };
 
-  const terrainInteractions: TerrainInteractions = {
-    onClick: handleTerrainClick,
-    onContextMenu: (event) => event.nativeEvent.preventDefault(),
-    onPointerDown: handleTerrainPointerDown,
-    onPointerLeave: handleTerrainPointerLeave,
-    onPointerMove: handleTerrainPointerMove,
-    onPointerUp: handleTerrainPointerUp
-  };
-
   return (
     <group>
       <OrbitControls
@@ -292,12 +254,20 @@ const SimulationView = ({ snapshot, resetCameraSignal, activeTool, onPlaceFoodRe
         minPolarAngle={0.25}
         target={cameraTarget}
       />
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} {...terrainInteractions}>
+      <mesh
+        receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]}
+        onClick={handleTerrainClick}
+        onContextMenu={(event) => event.nativeEvent.preventDefault()}
+        onPointerDown={handleTerrainPointerDown}
+        onPointerLeave={handleTerrainPointerLeave}
+        onPointerMove={handleTerrainPointerMove}
+        onPointerUp={handleTerrainPointerUp}
+      >
         <planeGeometry args={[width, depth]} />
-        <meshStandardMaterial color="#7c8f5f" roughness={0.95} />
+        <meshStandardMaterial color="#b7b98a" roughness={0.95} />
       </mesh>
-      <TerrainTile interactions={terrainInteractions} />
-      <gridHelper args={[width, 24, '#d9e2bf', '#9aaa77']} position={[0, 0.025, 0]} />
+      <gridHelper args={[width, 24, '#e3e5c4', '#a5aa7a']} position={[0, 0.01, 0]} />
       {foodPreviewPosition && (
         <mesh position={[foodPreviewPosition.x, foodPreviewHeight, foodPreviewPosition.z]}>
           <boxGeometry args={[0.9, 0.7, 0.9]} />
