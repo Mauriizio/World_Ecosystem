@@ -10,10 +10,10 @@ export type InitialWorldOptions = Readonly<{
 }>;
 
 const bounds: WorldBounds = {
-  minX: -36,
-  maxX: 36,
-  minZ: -36,
-  maxZ: 36
+  minX: -54,
+  maxX: 54,
+  minZ: -54,
+  maxZ: 54
 };
 
 export const createInitialWorld = ({

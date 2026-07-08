@@ -33,7 +33,7 @@ type CameraControlsHandle = {
   update: () => void;
 };
 
-const initialCameraPosition: [number, number, number] = [0, 58, 66];
+const initialCameraPosition: [number, number, number] = [0, 80, 92];
 const cameraTarget: [number, number, number] = [0, 0, 0];
 const orbitMouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.PAN, RIGHT: MOUSE.PAN } as const;
 const foodPreviewHeight = 0.35;
@@ -155,7 +155,7 @@ const antCarryingFoodFallbackRadius = 0.085;
 const selectedAntRingInnerRadius = 0.12;
 const selectedAntRingOuterRadius = 0.16;
 const foodModelHeight = 0.04;
-const foodModelScale = 0.14;
+const foodModelScale = 0.45;
 const foodModelRotation: [number, number, number] = [-Math.PI / 2, 0, 0];
 
 const antRotationY = (ant: AntSnapshot): number => Math.atan2(ant.direction.x, ant.direction.z);
@@ -374,7 +374,7 @@ const SimulationView = ({ snapshot, resetCameraSignal, activeTool, onPlaceFoodRe
         enableZoom
         makeDefault
         mouseButtons={orbitMouseButtons}
-        maxDistance={140}
+        maxDistance={180}
         maxPolarAngle={Math.PI / 2.15}
         minDistance={2.2}
         minPolarAngle={0.25}
