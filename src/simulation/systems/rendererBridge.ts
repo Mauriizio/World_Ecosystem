@@ -1,0 +1,25 @@
+import type { ReadonlyWorldSnapshot, WorldState } from '../world/worldTypes';
+
+const cloneWorld = <T>(value: T): T => {
+  if (typeof structuredClone === 'function') {
+    return structuredClone(value) as T;
+  }
+  return JSON.parse(JSON.stringify(value)) as T;
+};
+
+export const createRendererSnapshot = (world: WorldState): ReadonlyWorldSnapshot =>
+  Object.freeze(cloneWorld({
+    seed: world.seed,
+    tick: world.tick,
+    simulatedTime: world.simulatedTime,
+    experiment: world.experiment,
+    bounds: world.bounds,
+    ants: world.ants,
+    foods: world.foods,
+    nests: world.nests,
+    colonies: world.colonies,
+    foodPheromoneGrid: world.foodPheromoneGrid,
+    events: world.events,
+    interventionHistory: world.interventionHistory,
+    stats: world.stats
+  }));
